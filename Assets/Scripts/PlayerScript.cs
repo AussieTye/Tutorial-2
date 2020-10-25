@@ -9,11 +9,21 @@ public class PlayerScript : MonoBehaviour
     public float speed;
     public Text score;
     private int scoreValue = 0;
+    public Text lives;
+    private int livesValue = 3;
+    public Text loseText;
+    public Text winText;
+    public AudioClip musicClipOne;
+    public AudioClip musicClipTwo;
+    public AudioSource musicSource;
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
         score.text = scoreValue.ToString();
+        lives.text = livesValue.ToString();
+        winText.text = "";
+        loseText.text = "";
     }
 
     // Update is called once per frame
@@ -27,6 +37,24 @@ public class PlayerScript : MonoBehaviour
         {
             Application.Quit();
         }
+        if (scoreValue == 4)
+        {
+            livesValue = 3;
+            lives.text = livesValue.ToString();
+        }
+        if (scoreValue >= 8)
+        {
+            winText.text = "You Win! Game created by Jacob Tye.";
+            musicSource.clip = musicClipOne;
+            musicSource.Stop();
+            musicSource.clip = musicClipTwo;
+            musicSource.Play();
+        }
+        if (livesValue <= 0)
+        {
+            loseText.text = "You Lose! Game created by Jacob Tye.";
+        }
+    
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -37,9 +65,20 @@ public class PlayerScript : MonoBehaviour
             score.text = scoreValue.ToString();
             Destroy(collision.collider.gameObject);
         }
+        
+        if (collision.collider.tag == "Enemy")
+        {
+            livesValue -= 1;
+            lives.text = livesValue.ToString();
+            Destroy(collision.collider.gameObject);
+        }
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
+        if (scoreValue == 4)
+        {
+            transform.position = new Vector2(100.0f, 0.5f);
+        }
         if (collision.collider.tag == "Ground")
         {
             if (Input.GetKey(KeyCode.W))
@@ -48,5 +87,7 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
+
+    
     
 }
